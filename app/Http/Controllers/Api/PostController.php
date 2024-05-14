@@ -13,14 +13,30 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
         try {
+            $query = Post::query();
+            $perPage = 2;
+            $page = $request->input('page',1);
+            $seach = $request->input('seach');
+
+            if($seach){
+                $query->where('title','like','%'.$seach.'%');
+            }
+            $total = $query->count();
+
+            $resultat = $query->offset(($page - 1) * $perPage)->limit($perPage)->get();
+
             return response()->json([
                 'status' => 200,
                 'message' => 'all post getting successfully',
-                'date' => Post::all()
+                'current_page' => $page,
+                'last_page' => ceil($total / $perPage),
+                'items' => $resultat
             ]);
+
         } catch (Exception $e) {
             return response()->json($e);
         }
@@ -48,7 +64,7 @@ class PostController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'post created successfully',
-                'date' => $post
+                'data' => $post
             ]);
         } catch (Exception $e) {
             return response()->json($e);
@@ -72,9 +88,9 @@ class PostController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Updata the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function updata(Request $request, Post $post)
     {
         try {
             $post->title = $request->title;
@@ -83,8 +99,8 @@ class PostController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'post updated successfully',
-                'date' => $post
+                'message' => 'post updatad successfully',
+                'data' => $post
             ]);
         } catch (\Throwable $th) {
             return response()->json($th);
