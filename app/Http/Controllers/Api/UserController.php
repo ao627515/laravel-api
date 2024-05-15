@@ -32,9 +32,14 @@ class UserController extends Controller
         }
     }
 
-    public function login(LoginUserRequest $request){
+    public function login(LoginUserRequest $request)
+    {
         try {
-            if(auth()->attempt($request->only(['email', 'password']))){
+            if (auth()->attempt($request->only(['email', 'password']))) {
+
+                /**
+                 * @var $user App\Models\User
+                 */
                 $user = auth()->user();
 
                 $token = $user->createToken('authToken')->plainTextToken;
@@ -45,11 +50,11 @@ class UserController extends Controller
                     'user' => $user,
                     'token' => $token
                 ]);
-            }else{
+            } else {
                 return response()->json([
                     'status' => 401,
                     'message' => 'Invalid email or password'
-                    ]);
+                ]);
             }
         } catch (Exception $e) {
             return response()->json($e);

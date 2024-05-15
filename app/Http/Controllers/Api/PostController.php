@@ -59,6 +59,7 @@ class PostController extends Controller
             $post = new Post();
             $post->title = $request->title;
             $post->description = $request->description;
+            $post->user_id = auth()->user()->id;
             $post->save();
 
             return response()->json([
@@ -90,12 +91,19 @@ class PostController extends Controller
     /**
      * Updata the specified resource in storage.
      */
-    public function updata(Request $request, Post $post)
+    public function update(Request $request, Post $post)
     {
         try {
-            $post->title = $request->title;
-            $post->description = $request->description;
-            $post->save();
+            if(auth()->user()->id === $post->user_id){
+                $post->title = $request->title;
+                $post->description = $request->description;
+                $post->save();
+            }else{
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Not authorization to update this post',
+                ]);
+            }
 
             return response()->json([
                 'status' => 200,
@@ -113,7 +121,16 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         try {
-            $post->delete();
+
+            if(auth()->user()->id === $post->user_id){
+                $post->delete();
+
+            }else{
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Not authorization to delete this post',
+                ]);
+            }
 
             return response()->json([
                 'status' => 200,
