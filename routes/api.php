@@ -11,7 +11,8 @@ Route::post('posts', [PostController::class, 'store']);
 Route::put('posts/{post}', [PostController::class, 'update']);
 Route::put('posts/{post}', [PostController::class, 'destroy']);
 
-Route::post('/register', [UserController::class, 'register']);
+Route::post('register', [UserController::class, 'register']);
+Route::post('login', [UserController::class, 'login']);
 
 // Route::resource('post',PostController::class);
 
