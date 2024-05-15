@@ -43,14 +43,6 @@ class PostController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StorePostRequest $request)
@@ -65,7 +57,7 @@ class PostController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'post created successfully',
-                'data' => $post
+                'post' => $post
             ]);
         } catch (Exception $e) {
             return response()->json($e);
@@ -77,16 +69,24 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        try {
+            if(auth()->user()->id !== $post->user_id){
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Not authorization to show this post',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'get post successfully',
+                'post' => $post
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json($th);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Post $post)
-    {
-        //
-    }
 
     /**
      * Updata the specified resource in storage.
@@ -108,7 +108,7 @@ class PostController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'post updatad successfully',
-                'data' => $post
+                'post' => $post
             ]);
         } catch (\Throwable $th) {
             return response()->json($th);
